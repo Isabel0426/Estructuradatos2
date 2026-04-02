@@ -1,0 +1,138 @@
+#import java.util.Scanner;
+
+// Clase Nodo
+class Nodo {
+    String dato;
+    Nodo siguiente;
+
+    public Nodo(String dato) {
+        this.dato = dato;
+        this.siguiente = null;
+    }
+}
+
+// Implementación manual de pila
+class Pila {
+    private Nodo cima;
+
+    public Pila() {
+        cima = null;
+    }
+
+    public void push(String dato) {
+        Nodo nuevo = new Nodo(dato);
+        nuevo.siguiente = cima;
+        cima = nuevo;
+    }
+
+    public String pop() {
+        if (isEmpty()) return null;
+        String dato = cima.dato;
+        cima = cima.siguiente;
+        return dato;
+    }
+
+    public String peek() {
+        if (isEmpty()) return null;
+        return cima.dato;
+    }
+
+    public boolean isEmpty() {
+        return cima == null;
+    }
+}
+
+// Clase principal
+public class EditorTextoPilas {
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        Pila pilaPrincipal = new Pila();
+        Pila pilaDeshacer = new Pila();
+
+        int opcion;
+
+        do {
+            System.out.println("\n--- MENU ---");
+            System.out.println("1. Escribir texto");
+            System.out.println("2. Deshacer");
+            System.out.println("3. Rehacer");
+            System.out.println("4. Mostrar texto");
+            System.out.println("5. Salir");
+            System.out.print("Seleccione: ");
+
+            opcion = sc.nextInt();
+            sc.nextLine(); // limpiar buffer
+
+            switch (opcion) {
+
+                case 1:
+                    System.out.print("Ingrese texto: ");
+                    String texto = sc.nextLine();
+                    pilaPrincipal.push(texto);
+
+                    // limpiar pila de rehacer
+                    pilaDeshacer = new Pila();
+                    break;
+
+                case 2:
+                    if (!pilaPrincipal.isEmpty()) {
+                        String eliminado = pilaPrincipal.pop();
+                        pilaDeshacer.push(eliminado);
+                        System.out.println("Deshecho: " + eliminado);
+                    } else {
+                        System.out.println("Nada para deshacer.");
+                    }
+                    break;
+
+                case 3:
+                    if (!pilaDeshacer.isEmpty()) {
+                        String restaurado = pilaDeshacer.pop();
+                        pilaPrincipal.push(restaurado);
+                        System.out.println("Rehecho: " + restaurado);
+                    } else {
+                        System.out.println("Nada para rehacer.");
+                    }
+                    break;
+
+                case 4:
+                    mostrarTexto(pilaPrincipal);
+                    break;
+
+                case 5:
+                    System.out.println("Saliendo...");
+                    break;
+
+                default:
+                    System.out.println("Opción inválida");
+            }
+
+        } while (opcion != 5);
+
+        sc.close();
+    }
+
+    // Mostrar contenido sin destruir pila
+    public static void mostrarTexto(Pila pila) {
+        if (pila.isEmpty()) {
+            System.out.println("No hay texto.");
+            return;
+        }
+
+        Pila auxiliar = new Pila();
+
+        System.out.println("\nTexto actual:");
+
+        while (!pila.isEmpty()) {
+            String dato = pila.pop();
+            System.out.println(dato);
+            auxiliar.push(dato);
+        }
+
+        // Restaurar pila
+        while (!auxiliar.isEmpty()) {
+            pila.push(auxiliar.pop());
+        }
+    }
+}
